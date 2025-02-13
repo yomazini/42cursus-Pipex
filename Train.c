@@ -212,7 +212,60 @@ System call overhead							Lower	Slightly higher
 // 4/ Process Creation and Execution "fork and execve"
 
 
+/*
+1️⃣ fork()
+What is it?
 
+    fork() creates a new process (child process).
+    The child process is an exact copy of the parent.
+    After calling fork(), two processes exist:
+        Parent process (original)
+        Child process (newly created)
+*/
+// int main()
+// {
+// 	pid_t pid1= fork();
+// 	if (pid1 == 0)
+// 	{
+// 		// pid_t pid = getpid();
+// 		// close(pid);
+// 		return 1;
+// 		printf("\ni am child my pid:%d",getpid());
+// 		sleep(1);
+// 		printf("\nfff");
+// 		sleep(1);
+// 	}
+// 	printf("\ni ma the parent my child pid is %d",pid1);
+// }
+
+
+// int main() {
+//     pid_t pid = fork();
+
+//     if (pid == -1) {
+//         perror("fork failed");
+//         return 1;
+//     }
+
+//     if (pid == 0) {
+//         printf("I am the child!\n");
+//     } else {
+//         waitpid(pid, NULL, 0); // Parent waits for the child to finish
+//         printf("I am the parent!\n");
+//     }
+
+//     return 0;
+// }
+
+
+int main ()
+{
+	printf("Before the execve\n");
+	char **str; 
+	str = {,,NULL};
+	execve("/bin/ls","-la");
+	printf("\nafter");
+}
 
 		/*------------------------------------------*/
 
