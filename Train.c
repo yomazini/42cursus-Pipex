@@ -258,29 +258,356 @@ What is it?
 // }
 
 
-int main ()
-{
-	printf("Before the execve\n");
-	char **str; 
-	str = {,,NULL};
-	execve("/bin/ls","-la");
-	printf("\nafter");
-}
+// 2️⃣ execve()
+// What is it?
+
+//     execve() replaces the current process with a new program.
+//     It does not return if successful (the old process is completely replaced).
+
+// pathname: Path to the program (e.g., /bin/ls).
+// argv[]: Arguments (e.g., ["ls", "-l", NULL]).
+// envp[]: Environment variables (can pass environ).
+
+
+// int main() {
+//     char *args[] = {"/bin/ls","-la", NULL};
+
+//     printf("Before execve\n");
+//     execve("/bin/ls", args, NULL);
+//     printf("This will not be printed!\n");
+
+//     return 0;
+// }
 
 		/*------------------------------------------*/
 
 // 5/ Inter-Process Communication "pipe and heredoc 'ONLY IDEA AND HOW it works' " 
+
+// 1️⃣ pipe()
+// What is it?
+
+//     pipe() creates a unidirectional communication channel between processes.
+//     It allows one process to write and another to read.
+//     Works with file descriptors.
+
+// int main()
+// {
+// 	int fd[2];
+// 	char *chhhar = "Hello mothfckck";
+// 	int len = strlen(chhhar);
+// 	char buffer[25];
+// 	close (1);
+// 	close (0);
+// 	int flag = pipe(fd);
+// 	write(fd[1],chhhar,len);
+// 	read(fd[0],buffer,len);
+// 	printf("\nreceived: %s\n",buffer);
+// }	
+
+// int main()
+// {
+// 	char buffer[25];
+// 	int len;
+// 	int fds[2];
+// 	pipe(fds); // here pay attetion 
+// 	pid_t pid = fork(); // and here (what is switch the two)
+// 	if (pid == 0)
+// 	{
+// 		read(fds[0],buffer,sizeof(buffer));
+// 		printf("Child Recierved : %s\n",buffer);
+// 	}
+// 	else 
+// 	{
+// 		write(fds[1],"Message from parent", 19);
+
+// 	}
+// }
+
+//heredoc
+
+// int main() {
+//     char buffer[100];
+
+//     printf("Enter text (type 'STOP' to end):\n");
+//     while (1) {
+//         fgets(buffer, sizeof(buffer), stdin);
+//         if (strncmp(buffer, "STOP", 4) == 0) break;
+//         printf("You entered: %s", buffer);
+//     }
+//     return 0;
+// }
+
+// 2️⃣ heredoc
+// What is it?
+
+//     heredoc (<< DELIMITER) allows a shell script or program to take multiple lines of input until a specific keyword (delimiter) is entered.
+//     In pipex, it acts as an alternative to a file for input.
+
+// How It Works in Shell?
+
+// cat << EOF
+// Hello
+// This is a heredoc
+// EOF
+
+// ✅ Output:
+
+// Hello
+// This is a heredoc
+
+// (The input stops when EOF is entered.)
+
+/*
+Scenario	First Version (pipe() before fork())	Second Version (fork() before pipe())
+✅ Pipe exists in both processes?	✅ Yes	❌ No (child may not inherit a valid pipe)
+✅ Parent writes, child reads?	✅ Works correctly	❌ May fail (invalid file descriptors)
+✅ Safe behavior?	✅ Yes, predictable	❌ No, can cause hangs/crashes
+*/
+
+//Best Practice	Always call pipe(fds); before fork(); to ensure both processes inherit the same pipe.
+
 		/*------------------------------------------*/
 
 // 6/ Process Termination and Waiting "exit, wait, waitpid"
 		/*------------------------------------------*/
 
-// 7/ Integration - Building a Mini Pipex 
+
+// 1️⃣ exit()
+// What is it?
+
+//     exit() terminates the current process immediately.
+//     Can return an exit status (0 = success, non-zero = failure).
+
+// 2️⃣ wait()
+// What is it?
+
+//     wait() makes the parent process wait for a child process to finish.
+//     Returns the PID of the terminated child.
+
+// Syntax:
+
+// pid_t wait(int *status);
+
+//     status: Stores child's exit status.
+
+// 🚀 Exercise 2: Using wait()
+
+// Task:
+
+//     Fork a child process.
+//     The child should print "Child running" and exit with 100.
+//     The parent should wait and print "Child finished with status: X".
+
+// 📌 Hint: Use int status; wait(&status);.
+
+// int main()
+// {
+// 	char buf[25];
+// 	pid_t pid = fork();
+// 	int status;
+
+// 	if (pid == 0)
+// 	{
+// 		printf("Child Running");
+// 		exit(-1); // will output with 255 unsighnted char ;
+// 	//	exit(0);
+// 	}
+// 	else
+// 	{
+// 		wait(&status);
+// 		//wait(NULL);
+// 		printf("child finish with status %d\n", WEXITSTATUS(status));
+// 	}
+// }
+
+// 3️⃣ waitpid()
+// What is it?
+
+//     A more flexible version of wait(), allowing:
+//         Waiting for a specific child.
+//         Non-blocking behavior (using WNOHANG).
+
+// Syntax:
+
+// pid_t waitpid(pid_t pid, int *status, int options);
+
+//     pid: The specific child PID (or -1 for any child).
+//     status: Stores exit status.
+//     options: Can be 0 (blocking) or WNOHANG (non-blocking).
+
+// int main() {
+//     int status1, status2;
+//     pid_t pid1 = fork();
+
+//     if (pid1 == 0) {  // First child
+//         printf("Child 1 running...\n");
+//         exit(1);
+//     }
+
+//     pid_t pid2 = fork();
+//     if (pid2 == 0) {  // Second child
+//         printf("Child 2 running...\n");
+//         exit(2);
+//     }
+
+//     // Parent waits for both children
+//     waitpid(pid1, &status1, 0);
+//     printf("Parent: Child 1 exited with status %d\n", WEXITSTATUS(status1));
+
+//     waitpid(pid2, &status2, 0);
+//     printf("Parent: Child 2 exited with status %d\n", WEXITSTATUS(status2));
+
+//     return 0;
+// }
+
+
+
+
+// 7/ Integration - Building a Mini Pipex "to apply all these functions simple"
 
 		// 	Mini Pipex Implementation
     	// Exercise:
      	//    Implement ./pipex infile "cat" "wc -l" outfile.
      	//    Use fork(), pipe(), dup2(), execve(), and waitpid().
+
+
+/*
+Exercise 1: Execute Two Commands with a Pipe (ls | wc -l)
+📝 Task:
+
+    Create a parent-child process using fork().
+    The child process runs ls and sends output to a pipe.
+    The parent process reads from the pipe and executes wc -l.
+    Use perror() for errors, waitpid() to wait for child processes.
+
+*/
+// int main()
+// {
+// 	int fds[2];
+
+// 	if (pipe(fds) == -1)
+// 	{
+// 		perror("EROOR IN PIPE: ");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	pid_t pid1 = fork();
+// 	if (pid1 == -1)
+// 	{
+// 		perror("ERROR IN pid1");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	if (pid1 == 0)
+// 	{
+// 		dup2(fds[1],1);
+// 		close(fds[0]);
+// 		close(fds[1]);
+// 		char *char1[] = {"/bin/ls","-l",NULL};
+// 		execve(char1[0],char1,NULL);
+// 		perror("the exceeve is failed\n");
+// 		exit(EXIT_FAILURE);
+// 	}
+
+// 	pid_t pid2 = fork();
+// 	if (pid2 == -1)
+// 	{
+// 		perror("ERror in pid2");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	if (pid2 == 0)
+// 	{
+// 		dup2(fds[0],0);
+// 		close(fds[0]);
+// 		close(fds[1]);
+// 		char *char2[] = {"/usr/bin/wc","-l",NULL};
+// 		execve(char2[0],char2,NULL);
+// 		perror("the exceve is faileed");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	close(fds[0]);
+// 	close(fds[1]);
+// 	//  close(0);
+// 	waitpid(pid1,NULL,0);
+// 	waitpid(pid2,NULL,0);
+
+// // 	 Final Takeaways
+// // 	Code	Purpose	What Happens If Not Closed?
+// // 	close(fds[0]);	Closes pipe read end in parent.	wc -l may hang forever, waiting for EOF.
+// //	close(fds[1]);	Closes pipe write end in parent.	Pipe remains open, leading to deadlocks.
+// // 	close(1);	Closes stdout.	Nothing prints to terminal.
+// //	waitpid(pid1, NULL, 0);	Waits for child 1 (ls -l).	Zombie processes may appear.
+// // 	waitpid(pid2, NULL, 0);	Waits for child 2 (wc -l).	Parent may exit before child finishes.
+
+// }
+
+				/*----------*/
+
+/*
+Exercise 2: Create & Delete a File, Then Execute a Command
+📝 Task:
+
+    Check if testfile.txt exists using access().
+    If the file does not exist, create it and write "Hello, world!".
+    Fork a child process:
+        Use dup() or dup2() to redirect stdout to the file.
+        Execute echo "This is a test".
+    Wait for the child process using wait().
+    Delete testfile.txt using unlink().
+    Use perror() for error handling when opening/writing the file.
+*/
+
+int main()
+{
+	char *file  = "file.txt";
+	// check if file if not write (hello workdld )
+	if (access(file, F_OK) == -1)
+	{
+		perror("\nERROR: ");
+		int fd = open(file, O_WRONLY | O_APPEND | O_CREAT, 0777);
+		if (fd == -1)
+		{
+			perror("\nERROR 01: ");
+			exit(EXIT_FAILURE);
+		}
+		write(fd,"HELLO THIS\n", strlen("HELLO THIS\n"));
+		close(fd);
+	}
+	pid_t pid1 = fork();
+	if (pid1 == -1)
+	{
+		perror("\nERRO: ");
+		exit(EXIT_FAILURE);
+	}
+	if (pid1 == 0) // child process
+	{
+
+		char *str[] = {"/bin/echo","This is just a small test",NULL};
+		int fd1 = open(file, O_RDWR | O_APPEND);
+		// check for failure 
+		if (fd1 == -1)
+		{
+			perror("ERRO hna:");
+			exit(EXIT_FAILURE);
+		} 
+		dup2(fd1, 1);
+		//close(1);
+		execve(str[0],str,NULL);
+		perror("this is an error\n");
+		exit(EXIT_FAILURE);
+	}
+	wait(NULL);
+	// fork child 
+
+	// write this is test ffro m chidl in to file 
+	sleep(5);
+	// delete with unlink 
+	if (unlink(file) == -1)
+	{
+		perror("ERR:");
+
+	}
+	else
+		printf("file deleted succesfully");
+}
 
 		/*------------------------------------------*/
 
