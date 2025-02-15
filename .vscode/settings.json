@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"types.h": "c",
+		"__locale": "c",
+		"stdio.h": "c"
+	}
+}
