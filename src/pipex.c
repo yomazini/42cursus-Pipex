@@ -6,42 +6,59 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:10 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/15 22:18:13 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/15 23:20:52 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static void	oh_norms3(char **cmd, char *path_arr)
+void	check_args(int ac)
 {
-	free_all(cmd);
-	free_all(path_arr);
-	exit(127);
+	if (ac != 5)
+	{
+		ft_putstr_fd("Usage: ./pipex infile cmd1 cmd2 outfile\n", 2);
+		exit(1);
+	}
 }
 
-static	void	ft_execve_fail(char **cmd, char *path_arr, char *cmd_path)
+static void	setup_child_redirection(char *infile, int *pipe_fds)
 {
-	perror("ERR in execve: command not found:");
-	free(cmd_path);
-	oh_norms3(cmd, path_arr);
-}
+	int	fd;
 
-static void	call_child_p(char **env, char **av, int *pipe_fds, char **path_arr)
-{
-	int		fd;
-	char	**cmd;
-	char	*cmd_path;
-
-	fd = open(av[1], O_RDONLY);
+	fd = open(infile, O_RDONLY);
 	if (fd == -1)
 	{
 		perror("ERROR IN FILE INPUT:");
 		exit(1);
 	}
-	dup2(fd, 0);
-	dup2(pipe_fds[1], 1);
-	close(pipe_fds[0]);
+	dup2(fd, 0);              // Redirect standard input to infile
+	dup2(pipe_fds[1], 1);     // Redirect standard output to pipe write end
+	close(pipe_fds[0]);       // Close unused pipe read end
 	close(fd);
+}
+
+static void	setup_parent_redirection(char *outfile, int *pipe_fds)
+{
+	int	fd;
+
+	fd = open(outfile, O_CREAT | O_WRONLY | O_TRUNC, 0777);
+	if (fd == -1)
+	{
+		perror("Error opening output file");
+		exit(1);
+	}
+	dup2(pipe_fds[0], 0);     // Redirect standard input to pipe read end
+	dup2(fd, 1);              // Redirect standard output to outfile
+	close(pipe_fds[1]);       // Close unused pipe write end
+	close(fd);
+}
+
+static void	call_child_p(char **env, char **av, int *pipe_fds, char **path_arr)
+{
+	char	**cmd;
+	char	*cmd_path;
+
+	setup_child_redirection(av[1], pipe_fds);
 	cmd = ft_split(av[2], ' ');
 	if (!cmd)
 		exit(1);
@@ -49,28 +66,26 @@ static void	call_child_p(char **env, char **av, int *pipe_fds, char **path_arr)
 	if (!cmd_path)
 	{
 		ft_putendl_fd("Error: command not found", 2);
-		oh_norms3(cmd, path_arr);
+		free_all(cmd);
+		free_all(path_arr);
+		exit(127);
 	}
 	if (execve(cmd_path, cmd, env) == -1)
-		ft_execve_fail(cmd, path_arr, cmd_path);
+	{
+		perror("ERR in execve: command not found:");
+		free(cmd_path);
+		free_all(cmd);
+		free_all(path_arr);
+		exit(127);
+	}
 }
 
 static void	call_parent_p(char **env, char **av, int *pipe_fds, char **path_arr)
 {
-	int		fd;
 	char	**cmd;
 	char	*cmd_path;
 
-	fd = open(av[4], O_CREAT | O_WRONLY | O_TRUNC, 0777);
-	if (fd == -1)
-	{
-		perror("Error opening output file");
-		exit(1);
-	}
-	dup2(pipe_fds[0], 0);
-	dup2(fd, 1);
-	close(pipe_fds[1]);
-	close(fd);
+	setup_parent_redirection(av[4], pipe_fds);
 	cmd = ft_split(av[3], ' ');
 	if (!cmd)
 	{
@@ -81,10 +96,18 @@ static void	call_parent_p(char **env, char **av, int *pipe_fds, char **path_arr)
 	if (!cmd_path)
 	{
 		ft_putendl_fd("Error: command not found", 2);
-		oh_norms3(cmd, path_arr);
+		free_all(cmd);
+		free_all(path_arr);
+		exit(127);
 	}
 	if (execve(cmd_path, cmd, env) == -1)
-		ft_execve_fail(cmd, path_arr, cmd_path);
+	{
+		perror("ERR in execve: command not found:");
+		free(cmd_path);
+		free_all(cmd);
+		free_all(path_arr);
+		exit(127);
+	}
 }
 
 int	main(int ac, char **av, char **env)
@@ -93,11 +116,7 @@ int	main(int ac, char **av, char **env)
 	pid_t	check_pid;
 	char	**path_arr;
 
-	if (ac != 5)
-	{
-		ft_putstr_fd("Usage: ./pipex infile cmd1 cmd2 outfile\n", 2);
-		exit(1);
-	}
+	check_args(ac);
 	if (pipe(fds) == -1)
 	{
 		perror("pipe:");

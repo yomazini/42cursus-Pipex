@@ -6,70 +6,42 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:08 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/15 21:46:57 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/15 23:18:23 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static void	oh_norms2(char **cmds)
+void	setup_child_redirection(char *infile, int *pipe_fds)
 {
-	ft_putendl_fd("command not found", 2);
-	free_all(cmds);
-	return (NULL);
+	int	fd;
+
+	fd = open(infile, O_RDONLY);
+	if (fd == -1)
+	{
+		perror("ERROR IN FILE INPUT:");
+		exit(1);
+	}
+	dup2(fd, 0);
+	dup2(pipe_fds[1], 1);
+	close(pipe_fds[0]);
+	close(fd);
 }
 
-static int	oh_norms1(char **cmds)
+void	setup_parent_redirection(char *outfile, int *pipe_fds)
 {
-	if (!cmds || !cmds[0])
+	int	fd;
+
+	fd = open(outfile, O_CREAT | O_WRONLY | O_TRUNC, 0777);
+	if (fd == -1)
 	{
-		if (cmds)
-			free_all(cmds);
-		return (0);
+		perror("Error opening output file");
+		exit(1);
 	}
-	return (1);
-}
-
-char	*get_path(char **all_path, char *cmd)
-{
-	char	**cmds;
-	char	*joined_cmd;
-	char	*full_path;
-	int		i;
-
-	cmds = ft_split(cmd, ' ');
-	if (oh_norms1(cmds) == 0)
-		return (NULL);
-	i = -1;
-	while (all_path[++i])
-	{
-		joined_cmd = ft_strjoin(all_path[i], "/");
-		if (!joined_cmd)
-			return (free_all(cmds), NULL);
-		full_path = ft_strjoin(joined_cmd, cmds[0]);
-		free(joined_cmd);
-		if (!full_path)
-			return (free_all(cmds), NULL);
-		if (access(full_path, F_OK | X_OK) == 0)
-			return (free_all(cmds), full_path);
-		free(full_path);
-	}
-	oh_norms2(cmds);
-}
-
-void	free_all(char **tofree)
-{
-	int	i;
-
-	i = 0;
-	if (!tofree)
-		return ;
-	while (tofree[i])
-	{
-		free(tofree[i]);
-		i++;
-	}
-	free(tofree);
+	dup2(pipe_fds[0], 0);
+	dup2(fd, 1);
+	close(pipe_fds[1]);
+	close(fd);
 }
 
 char	**get_env_arr(char **env)
@@ -77,7 +49,7 @@ char	**get_env_arr(char **env)
 	char	*path;
 
 	path = NULL;
-	while (*env && path == NULL)
+	while (*env && !path)
 	{
 		if (ft_strncmp(*env, "PATH=", 5) == 0)
 			path = *env + 5;
@@ -89,4 +61,70 @@ char	**get_env_arr(char **env)
 		exit(1);
 	}
 	return (ft_split(path, ':'));
+}
+
+void	free_all(char **tofree)
+{
+	int	i;
+
+	i = 0;
+	if (!tofree)
+		return;
+	while (tofree[i])
+	{
+		free(tofree[i]);
+		i++;
+	}
+	free(tofree);
+}
+
+/*
+** get_path:
+**   - Splits the command into tokens (using only the first token for the path).
+**   - Iterates over each directory in the PATH array.
+**   - Constructs "directory/command" and checks if it exists and is executable.
+**   - If found, frees the tokens and returns the full path.
+**   - Otherwise, prints an error message and returns NULL.
+*/
+char	*get_path(char **all_path, char *cmd)
+{
+	char	**cmds;
+	char	*joined_cmd;
+	char	*full_path;
+	int		i;
+
+	cmds = ft_split(cmd, ' ');
+	if (!cmds || !cmds[0])
+	{
+		if (cmds)
+			free_all(cmds);
+		return (NULL);
+	}
+	i = 0;
+	while (all_path[i])
+	{
+		joined_cmd = ft_strjoin(all_path[i], "/");
+		if (!joined_cmd)
+		{
+			free_all(cmds);
+			return (NULL);
+		}
+		full_path = ft_strjoin(joined_cmd, cmds[0]);
+		free(joined_cmd);
+		if (!full_path)
+		{
+			free_all(cmds);
+			return (NULL);
+		}
+		if (access(full_path, F_OK | X_OK) == 0)
+		{
+			free_all(cmds);
+			return (full_path);
+		}
+		free(full_path);
+		i++;
+	}
+	ft_putendl_fd("command not found", 2);
+	free_all(cmds);
+	return (NULL);
 }
