@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/09 18:10:49 by ymazini           #+#    #+#             */
-/*   Updated: 2024/12/12 02:31:11 by ymazini          ###   ########.fr       */
+/*   Created: 2024/12/09 18:10:17 by ymazini           #+#    #+#             */
+/*   Updated: 2025/02/15 14:12:59 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "libft.h"
 
 static char	*read_line(int fd, char **saved)
 {
@@ -60,17 +60,17 @@ static char	*extract_line(char **saved)
 
 char	*get_next_line(int fd)
 {
-	static char	*saved;
+	static char	*saved[OPEN_MAX];
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd >= OPEN_MAX || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (!saved)
-		saved = ft_strdup("");
-	if (!saved || !read_line(fd, &saved))
-		return (free(saved), saved = NULL, NULL);
-	line = extract_line(&saved);
+	if (!saved[fd])
+		saved[fd] = ft_strdup("");
+	if (!saved[fd] || !read_line(fd, &saved[fd]))
+		return (free(saved[fd]), saved[fd] = NULL, NULL);
+	line = extract_line(&saved[fd]);
 	if (!line)
-		return (free(saved), saved = NULL, NULL);
+		return (free(saved[fd]), saved[fd] = NULL, NULL);
 	return (line);
 }
