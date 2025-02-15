@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:04 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/15 14:34:01 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/15 14:44:52 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,5 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <fcntl.h>  
-
 
 #endif

@@ -17,9 +17,6 @@ HEADERS_BONUS = src_bonus/pipex_bonus.h
 LIBFT_DIR = lib
 LIBFT = $(LIBFT_DIR)/libft.a
 
-LIBFT_DIR = 
-LIBFT = $(LIBFT_DIR)/libft.a
-
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT)
