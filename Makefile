@@ -6,11 +6,11 @@ CFLAGS = -Wall -Wextra -Werror
 
 RM = rm -rf
 
-SRCS = src/pipex.c src/tools.c  src/testingmadatory.c
+SRCS = src/pipex.c src/tools.c
 OBJS = $(SRCS:.c=.o)
 HEADERS = src/pipex.h 
 
-SRCS_BONUS = src_bonus/pipex_bonus.c src_bonus/tools_bonus.c src_bonus/testingbonus.c
+SRCS_BONUS = src_bonus/pipex_bonus.c src_bonus/tools_bonus.c 
 OBJS_BONUS = $(SRCS_BONUS:.c=.o)
 HEADERS_BONUS = src_bonus/pipex_bonus.h
 
