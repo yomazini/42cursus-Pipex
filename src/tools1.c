@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 21:06:00 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/16 21:07:08 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/16 21:31:52 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	check_args(int ac)
 	if (ac != 5)
 		(ft_putstr_fd("Usage: ./pipex infile cmd1 cmd2 outfile\n", 2), exit(1));
 }
+
 void	setup_child_redirection(char *infile, int *pipe_fds)
 {
 	int	fd;
@@ -51,4 +52,14 @@ void	setup_parent_redirection(char *outfile, int *pipe_fds)
 	dup2(pipe_fds[0], 0);
 	dup2(fd, 1);
 	(close(pipe_fds[1]), close(fd));
+}
+
+void	handle_cmd_not_found(char **cmd, char **path_arr)
+{
+	ft_putstr_fd("pipex: ", 2);
+	ft_putstr_fd(cmd[0], 2);
+	ft_putendl_fd(": command not found", 2);
+	free_all(cmd);
+	free_all(path_arr);
+	exit(127);
 }

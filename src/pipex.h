@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:04 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/16 21:01:19 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/16 21:31:14 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,5 +26,6 @@ void	setup_parent_redirection(char *outfile, int *pipe_fds);
 char	**get_env_arr(char **env);
 void	free_all(char **tofree);
 char	*get_path(char **all_path, char *cmd);
+void	handle_cmd_not_found(char **cmd, char **path_arr);
 
 #endif
