@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:10 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/16 21:31:41 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/16 21:54:09 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,8 @@
 
 static void	handle_exec_error(char *cmd_path, char **cmd, char **path_arr)
 {
-	ft_putstr_fd("pipex: ", 2);
-	ft_putstr_fd(cmd[0], 2);
-	ft_putendl_fd(": command not found", 2);
+	ft_putstr_fd("pipex: command not found: ", 2);
+	ft_putendl_fd(cmd[0], 2);
 	free(cmd_path);
 	free_all(cmd);
 	free_all(path_arr);

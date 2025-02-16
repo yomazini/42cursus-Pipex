@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 21:06:00 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/16 21:31:52 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/16 21:54:45 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,8 @@ void	setup_parent_redirection(char *outfile, int *pipe_fds)
 
 void	handle_cmd_not_found(char **cmd, char **path_arr)
 {
-	ft_putstr_fd("pipex: ", 2);
-	ft_putstr_fd(cmd[0], 2);
-	ft_putendl_fd(": command not found", 2);
+	ft_putstr_fd("pipex: command not found: ", 2);
+	ft_putendl_fd(cmd[0], 2);
 	free_all(cmd);
 	free_all(path_arr);
 	exit(127);
