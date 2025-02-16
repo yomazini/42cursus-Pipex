@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -Werror
 
 RM = rm -rf
 
-SRCS = src/pipex.c src/tools.c
+SRCS = src/pipex.c src/tools.c src/tools1.c
 OBJS = $(SRCS:.c=.o)
 HEADERS = src/pipex.h 
 
