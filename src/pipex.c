@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:10 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/16 20:11:02 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/16 20:51:54 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ static void	call_child_p(char **env, char **av, int *pipe_fds, char **path_arr)
 	cmd_path = get_path(path_arr, av[2]);
 	if (!cmd_path)
 	{
- 		   ft_putstr_fd("pipex: ", 2);
-   		 ft_putstr_fd(cmd[0], 2);
-   		 ft_putendl_fd(": command not found", 2);
+ 		ft_putstr_fd("pipex: ", 2);
+   		ft_putstr_fd(cmd[0], 2);
+   		ft_putendl_fd(": command not found", 2);
 		free_all(cmd);
 		free_all(path_arr);
 		exit(127);
@@ -63,7 +63,9 @@ static void	call_parent_p(char **env, char **av, int *pipe_fds, char **path_arr)
 	cmd_path = get_path(path_arr, av[3]);
 	if (!cmd_path)
 	{
-		ft_putendl_fd("Error: command not found", 2);
+ 		   ft_putstr_fd("pipex: ", 2);
+   		 ft_putstr_fd(cmd[0], 2);
+   		 ft_putendl_fd(": command not found", 2);
 		free_all(cmd);
 		free_all(path_arr);
 		exit(127);
@@ -90,13 +92,13 @@ int main(int ac, char **av, char **env)
     path_arr = get_env_arr(env);
     if (pipe(fds) == -1)
 	{
-		free_all(path_arr);  // Add this before exit
+		free_all(path_arr);
         (perror("pipex: pipe"), exit(1));
 	}
     pid1 = fork();
     if (pid1 < 0)
 	{
-    	free_all(path_arr);  // Add this
+    	free_all(path_arr);
     	perror("pipex: fork");
     	exit(1);
 	}
@@ -105,7 +107,11 @@ int main(int ac, char **av, char **env)
     
     pid2 = fork();
     if (pid2 < 0)
-        (perror("pipex: fork"), exit(1));
+	{
+	free_all(path_arr);
+    perror("pipex: fork");
+    exit(1);
+	}
     if (pid2 == 0)
         call_parent_p(env, av, fds, path_arr);
     
@@ -114,11 +120,50 @@ int main(int ac, char **av, char **env)
 	waitpid(pid1, &status1, 0);
 	waitpid(pid2, &status2, 0);
 	free_all(path_arr);
-	
     if (WIFEXITED(status1) && WEXITSTATUS(status1) != 0)
         exit(WEXITSTATUS(status1));
     if (WIFEXITED(status2))
         exit(WEXITSTATUS(status2));
-	free_all(path_arr);
     exit(1);
 }
+
+
+// Replace exit logic with : "check later on in intense tests" 
+// int exit_status = 1;
+
+// if (WIFEXITED(status2))
+//     exit_status = WEXITSTATUS(status2);
+// else if (WIFSIGNALED(status2))
+//     exit_status = 128 + WTERMSIG(status2);
+
+// free_all(path_arr);
+// exit(exit_status);
+
+// Replace exit logic with:
+// int exit_status = 1;
+
+// if (WIFEXITED(status2))
+//     exit_status = WEXITSTATUS(status2);
+// else if (WIFSIGNALED(status2))
+//     exit_status = 128 + WTERMSIG(status2);
+// else if (WIFEXITED(status1))
+//     exit_status = WEXITSTATUS(status1);
+
+// exit(exit_status);  // Prioritize last command's status
+
+/*
+	when will fails "TEST 1" 
+	Test Case 1: cmd1 fails but cmd2 succeeds
+Copy
+
+$ ./pipex infile "false" "true" outfile
+
+Expected behavior (like shell): Exit code = 0 (success)
+Original code would exit: 1 (failure)
+Reason: Original code prioritizes cmd1's exit code if non-zero.
+*/
+
+/*
+	when will fails "TEST 2" 
+	
+*/

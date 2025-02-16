@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:08 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/16 20:01:23 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/16 20:23:12 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	setup_child_redirection(char *infile, int *pipe_fds)
 	fd = open(infile, O_RDONLY);
 	if (fd == -1)
 	{
-		perror("pipex: ");
+		perror("pipex: infile");
 		exit(1);
 	}
 	dup2(fd, 0);
@@ -44,7 +44,7 @@ void	setup_parent_redirection(char *outfile, int *pipe_fds)
 	fd = open(outfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd == -1)
 	{
-		perror("Error opening output file");
+		perror("pipex: outfile");
 		exit(1);
 	}
 	dup2(pipe_fds[0], 0);
@@ -66,11 +66,8 @@ char	**get_env_arr(char **env)
 	}
 	if (!path)
 	{
-   		 ft_putendl_fd("pipex: PATH not found", 2);
-  		  //return (ft_split("", ':')); here still in testing phase 
-		  // whether exit or not return the split 
-		  exit(1);
-	
+   		ft_putendl_fd("pipex: PATH not found", 2);
+  		return (ft_split("", ':'));
 	}
 	return (ft_split(path, ':'));
 }
