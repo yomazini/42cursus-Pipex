@@ -6,11 +6,20 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:08 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/15 23:18:23 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/16 16:18:21 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+void	check_args(int ac)
+{
+	if (ac != 5)
+	{
+		ft_putstr_fd("Usage: ./pipex infile cmd1 cmd2 outfile\n", 2);
+		exit(1);
+	}
+}
 
 void	setup_child_redirection(char *infile, int *pipe_fds)
 {
@@ -19,7 +28,7 @@ void	setup_child_redirection(char *infile, int *pipe_fds)
 	fd = open(infile, O_RDONLY);
 	if (fd == -1)
 	{
-		perror("ERROR IN FILE INPUT:");
+		perror("ERROR IN FILE INPUT");
 		exit(1);
 	}
 	dup2(fd, 0);
@@ -32,7 +41,7 @@ void	setup_parent_redirection(char *outfile, int *pipe_fds)
 {
 	int	fd;
 
-	fd = open(outfile, O_CREAT | O_WRONLY | O_TRUNC, 0777);
+	fd = open(outfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd == -1)
 	{
 		perror("Error opening output file");
@@ -57,7 +66,7 @@ char	**get_env_arr(char **env)
 	}
 	if (!path)
 	{
-		perror("error in path here");
+		perror("Error in Path here");
 		exit(1);
 	}
 	return (ft_split(path, ':'));
@@ -69,7 +78,7 @@ void	free_all(char **tofree)
 
 	i = 0;
 	if (!tofree)
-		return;
+		return ;
 	while (tofree[i])
 	{
 		free(tofree[i]);
@@ -78,14 +87,6 @@ void	free_all(char **tofree)
 	free(tofree);
 }
 
-/*
-** get_path:
-**   - Splits the command into tokens (using only the first token for the path).
-**   - Iterates over each directory in the PATH array.
-**   - Constructs "directory/command" and checks if it exists and is executable.
-**   - If found, frees the tokens and returns the full path.
-**   - Otherwise, prints an error message and returns NULL.
-*/
 char	*get_path(char **all_path, char *cmd)
 {
 	char	**cmds;
@@ -124,7 +125,7 @@ char	*get_path(char **all_path, char *cmd)
 		free(full_path);
 		i++;
 	}
-	ft_putendl_fd("command not found", 2);
+	// ft_putendl_fd("command not found", 2);
 	free_all(cmds);
 	return (NULL);
 }
