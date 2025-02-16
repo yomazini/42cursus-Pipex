@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:08 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/16 16:18:21 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/16 20:01:23 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	setup_child_redirection(char *infile, int *pipe_fds)
 	fd = open(infile, O_RDONLY);
 	if (fd == -1)
 	{
-		perror("ERROR IN FILE INPUT");
+		perror("pipex: ");
 		exit(1);
 	}
 	dup2(fd, 0);
@@ -66,8 +66,11 @@ char	**get_env_arr(char **env)
 	}
 	if (!path)
 	{
-		perror("Error in Path here");
-		exit(1);
+   		 ft_putendl_fd("pipex: PATH not found", 2);
+  		  //return (ft_split("", ':')); here still in testing phase 
+		  // whether exit or not return the split 
+		  exit(1);
+	
 	}
 	return (ft_split(path, ':'));
 }
@@ -95,12 +98,17 @@ char	*get_path(char **all_path, char *cmd)
 	int		i;
 
 	cmds = ft_split(cmd, ' ');
-	if (!cmds || !cmds[0])
+	if (!cmds || !cmds[0] || ft_strlen(cmds[0]) == 0)
 	{
-		if (cmds)
-			free_all(cmds);
-		return (NULL);
+	    free_all(cmds);
+	    return (NULL);
 	}
+	if (cmds[0][0] == '/' || (cmds[0][0] == '.' && cmds[0][1] == '/'))
+    {
+        char *path = ft_strdup(cmds[0]);
+        free_all(cmds);
+        return (path);
+    }
 	i = 0;
 	while (all_path[i])
 	{
@@ -114,8 +122,9 @@ char	*get_path(char **all_path, char *cmd)
 		free(joined_cmd);
 		if (!full_path)
 		{
-			free_all(cmds);
-			return (NULL);
+			perror("pipex");
+    		free_all(cmds);
+    		return (NULL);
 		}
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
@@ -125,7 +134,6 @@ char	*get_path(char **all_path, char *cmd)
 		free(full_path);
 		i++;
 	}
-	// ft_putendl_fd("command not found", 2);
 	free_all(cmds);
 	return (NULL);
 }
