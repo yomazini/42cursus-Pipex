@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:10 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/16 21:54:09 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 11:38:05 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static void	call_child_p(char **env, char **av, int *pipe_fds, char **path_arr)
 	if (!cmd)
 	{
 		free_all(path_arr);
-		ft_putendl_fd("Error: command split failed", 2);
+		ft_putendl_fd("Error: command Split Failed", 2);
 		exit(1);
 	}
 	cmd_path = get_path(path_arr, av[2]);
