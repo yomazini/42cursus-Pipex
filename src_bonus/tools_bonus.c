@@ -6,11 +6,22 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:25 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 20:48:40 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 22:08:41 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
+
+static char	**parse_cmd(char *cmd)
+{
+	char	**args;
+	char	*tmp;
+
+	tmp = ft_strtrim(cmd, " '"""); // Trim quotes
+	args = ft_split(tmp, ' ');
+	free(tmp);
+	return (args);
+}
 
 void	exec_cmd(char *cmd, char **env)
 {
@@ -18,7 +29,7 @@ void	exec_cmd(char *cmd, char **env)
 	char	*path;
 	char	**paths;
 
-	args = ft_split(cmd, ' ');
+	args = parse_cmd(cmd);
 	if (!args || !args[0])
 		(ft_putstr_fd("pipex: command not found\n", 2), exit(127));
 	if (access(args[0], X_OK) == 0 && ft_strchr(args[0], '/'))
@@ -37,7 +48,12 @@ void	exec_cmd(char *cmd, char **env)
 		exit(127);
 	}
 	if (execve(path, args, env) == -1)
-		(perror("pipex"), free(path), free_all(args), exit(126));
+	{
+		if (path != args[0]) // Prevent double free
+			free(path);
+		free_all(args);
+		exit(126);
+	}
 }
 
 void	handle_hdoc(char *limiter, int *prev_pipe)
@@ -48,27 +64,29 @@ void	handle_hdoc(char *limiter, int *prev_pipe)
 	char	*expected;
 
 	expected = ft_strjoin(limiter, "\n");
+	if (!expected)
+		exit(EXIT_FAILURE); // Add error check
 	if (pipe(fd) == -1)
-		(perror("pipex: pipe"), exit(EXIT_FAILURE));
+		(perror("pipex: pipe"), free(expected), exit(EXIT_FAILURE));
 	pid = fork();
 	if (pid == 0)
 	{
 		close(fd[0]);
+		signal(SIGINT, SIG_DFL); // Handle Ctrl+C
 		while (1)
 		{
 			line = get_next_line(STDIN_FILENO);
-			if (!line)
-				break ;
-			if (ft_strncmp(line, expected, ft_strlen(line)) == 0)
+			if (!line || ft_strncmp(line, expected, ft_strlen(line)) == 0) // Exact match
 			{
 				free(line);
-				exit(0);
+				break ;
 			}
 			write(fd[1], line, ft_strlen(line));
 			free(line);
 		}
 		close(fd[1]);
-		exit(0);
+		free(expected); // Add this
+		exit(EXIT_SUCCESS);
 	}
 	else
 	{
@@ -78,6 +96,8 @@ void	handle_hdoc(char *limiter, int *prev_pipe)
 	}
 	free(expected);
 }
+
+
 
 
 

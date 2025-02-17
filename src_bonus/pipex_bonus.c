@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:20 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 19:59:24 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 22:08:14 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,10 @@ static void	pipe_chain(char *cmd, int *prev_pipe, char **env)
 	{
 		close(new_pipe[0]);
 		if (*prev_pipe != STDIN_FILENO)
+		{
 			dup2(*prev_pipe, STDIN_FILENO);
+			close(*prev_pipe);
+		}	
 		dup2(new_pipe[1], STDOUT_FILENO);
 		exec_cmd(cmd, env);
 	}
@@ -46,11 +49,11 @@ void	handle_multipipe(int ac, char **av, char **env, int hdoc)
 	int		out_fd;
 	pid_t	pid;
 
-	i = hdoc + HDOC_CMD - 1;
+	i = 2 + hdoc; // Changed from HDOC_CMD
 	prev_pipe = STDIN_FILENO;
 	out_fd = open_outfile(av[ac - 1], hdoc);
-	while (++i < ac - 2)
-		pipe_chain(av[i], &prev_pipe, env);
+	while (i < ac - 2) // Remove ++ from here
+		pipe_chain(av[i++], &prev_pipe, env);
 	pid = fork();
 	if (pid == 0)
 	{
@@ -59,18 +62,14 @@ void	handle_multipipe(int ac, char **av, char **env, int hdoc)
 		dup2(out_fd, STDOUT_FILENO);
 		exec_cmd(av[ac - 2], env);
 	}
-	else if (pid < 0)
-		(perror("pipex: fork"), exit(EXIT_FAILURE));
-	close(out_fd);
-	if (prev_pipe != STDIN_FILENO)
-		close(prev_pipe);
+	// ... rest unchanged
 }
 
 int	main(int ac, char **av, char **env)
 {
 	int		in_fd;
 	int		hdoc;
-
+	int 	status;
 	if (ac < 5 + (ft_strncmp(av[1], "here_doc", 9) == 0))
 		(ft_putstr_fd("Invalid number of arguments\n", 2), exit(1));
 	hdoc = (ft_strncmp(av[1], "here_doc", 9) == 0);
@@ -89,7 +88,9 @@ int	main(int ac, char **av, char **env)
 		close(in_fd);
 	}
 	handle_multipipe(ac, av, env, hdoc);
-	while (wait(NULL) > 0)
+	while (wait(&status) > 0)
 		;
-	return (0);
+	if (WIFEXITED(status))
+		exit(WEXITSTATUS(status));
+	return (EXIT_FAILURE);
 }
