@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:34:13 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 15:21:18 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 17:19:58 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "../lib/libft.h"
 # include <unistd.h>
 # include <stdio.h>
+# include <string.h>
 # include <stdlib.h>
 # include <sys/types.h>
 # include <sys/wait.h>
