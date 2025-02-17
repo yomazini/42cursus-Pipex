@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:25 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 22:08:41 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 22:50:22 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static char	**parse_cmd(char *cmd)
 	char	**args;
 	char	*tmp;
 
-	tmp = ft_strtrim(cmd, " '"""); // Trim quotes
+	tmp = ft_strtrim(cmd, " '""");
 	args = ft_split(tmp, ' ');
 	free(tmp);
 	return (args);
@@ -49,7 +49,7 @@ void	exec_cmd(char *cmd, char **env)
 	}
 	if (execve(path, args, env) == -1)
 	{
-		if (path != args[0]) // Prevent double free
+		if (path != args[0])
 			free(path);
 		free_all(args);
 		exit(126);
@@ -65,18 +65,18 @@ void	handle_hdoc(char *limiter, int *prev_pipe)
 
 	expected = ft_strjoin(limiter, "\n");
 	if (!expected)
-		exit(EXIT_FAILURE); // Add error check
+		exit(EXIT_FAILURE);
 	if (pipe(fd) == -1)
-		(perror("pipex: pipe"), free(expected), exit(EXIT_FAILURE));
+		(perror("pipex: pipe"), free(expected), exit(1));
 	pid = fork();
 	if (pid == 0)
 	{
 		close(fd[0]);
-		signal(SIGINT, SIG_DFL); // Handle Ctrl+C
+		signal(SIGINT, SIG_DFL);
 		while (1)
 		{
 			line = get_next_line(STDIN_FILENO);
-			if (!line || ft_strncmp(line, expected, ft_strlen(line)) == 0) // Exact match
+			if (!line || ft_strncmp(line, expected, ft_strlen(line)) == 0) 
 			{
 				free(line);
 				break ;
@@ -85,7 +85,7 @@ void	handle_hdoc(char *limiter, int *prev_pipe)
 			free(line);
 		}
 		close(fd[1]);
-		free(expected); // Add this
+		free(expected);
 		exit(EXIT_SUCCESS);
 	}
 	else
@@ -96,10 +96,6 @@ void	handle_hdoc(char *limiter, int *prev_pipe)
 	}
 	free(expected);
 }
-
-
-
-
 
 int	open_outfile(char *path, int hdoc)
 {

@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:20 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 22:08:14 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 22:50:55 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,10 @@ void	handle_multipipe(int ac, char **av, char **env, int hdoc)
 	int		out_fd;
 	pid_t	pid;
 
-	i = 2 + hdoc; // Changed from HDOC_CMD
+	i = 2 + hdoc;
 	prev_pipe = STDIN_FILENO;
 	out_fd = open_outfile(av[ac - 1], hdoc);
-	while (i < ac - 2) // Remove ++ from here
+	while (i < ac - 2)
 		pipe_chain(av[i++], &prev_pipe, env);
 	pid = fork();
 	if (pid == 0)
@@ -62,7 +62,6 @@ void	handle_multipipe(int ac, char **av, char **env, int hdoc)
 		dup2(out_fd, STDOUT_FILENO);
 		exec_cmd(av[ac - 2], env);
 	}
-	// ... rest unchanged
 }
 
 int	main(int ac, char **av, char **env)
@@ -76,8 +75,8 @@ int	main(int ac, char **av, char **env)
 	if (hdoc)
 	{
 		handle_hdoc(av[2], &in_fd);
-		dup2(in_fd, STDIN_FILENO); // Add this line
-		close(in_fd); // Add this line
+		dup2(in_fd, STDIN_FILENO);
+		close(in_fd);
 	}
 	else
 	{
