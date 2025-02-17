@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:20 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 22:50:55 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 23:28:09 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static void	pipe_chain(char *cmd, int *prev_pipe, char **env)
 	}
 }
 
-void	handle_multipipe(int ac, char **av, char **env, int hdoc)
+pid_t	handle_multipipe(int ac, char **av, char **env, int hdoc)
 {
 	int		i;
 	int		prev_pipe;
@@ -62,6 +62,14 @@ void	handle_multipipe(int ac, char **av, char **env, int hdoc)
 		dup2(out_fd, STDOUT_FILENO);
 		exec_cmd(av[ac - 2], env);
 	}
+	else
+	{
+		close(out_fd);
+		if (prev_pipe != STDIN_FILENO)
+			close(prev_pipe);
+		return (pid); // Return last command's PID
+	}
+	return (-1);
 }
 
 int	main(int ac, char **av, char **env)
@@ -69,6 +77,7 @@ int	main(int ac, char **av, char **env)
 	int		in_fd;
 	int		hdoc;
 	int 	status;
+	pid_t last_pid;
 	if (ac < 5 + (ft_strncmp(av[1], "here_doc", 9) == 0))
 		(ft_putstr_fd("Invalid number of arguments\n", 2), exit(1));
 	hdoc = (ft_strncmp(av[1], "here_doc", 9) == 0);
@@ -86,9 +95,9 @@ int	main(int ac, char **av, char **env)
 		dup2(in_fd, STDIN_FILENO);
 		close(in_fd);
 	}
-	handle_multipipe(ac, av, env, hdoc);
-	while (wait(&status) > 0)
-		;
+	last_pid = handle_multipipe(ac, av, env, hdoc);
+	waitpid(last_pid, &status, 0); // Get last command's status
+	while (wait(NULL) > 0); // Clean other processes
 	if (WIFEXITED(status))
 		exit(WEXITSTATUS(status));
 	return (EXIT_FAILURE);

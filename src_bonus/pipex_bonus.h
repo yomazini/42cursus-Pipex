@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:34:13 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 22:50:39 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 23:26:40 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # define HDOC_LIMITER 2
 # define HDOC_CMD 3
 
-void	handle_multipipe(int ac, char **av, char **env, int hdoc);
+pid_t	handle_multipipe(int ac, char **av, char **env, int hdoc);
 void	handle_hdoc(char *limiter, int *prev_pipe);
 void	exec_cmd(char *cmd, char **env);
 int		open_outfile(char *path, int hdoc);
