@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:20 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 17:18:57 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 19:59:24 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,11 @@ int	main(int ac, char **av, char **env)
 		(ft_putstr_fd("Invalid number of arguments\n", 2), exit(1));
 	hdoc = (ft_strncmp(av[1], "here_doc", 9) == 0);
 	if (hdoc)
+	{
 		handle_hdoc(av[2], &in_fd);
+		dup2(in_fd, STDIN_FILENO); // Add this line
+		close(in_fd); // Add this line
+	}
 	else
 	{
 		in_fd = open(av[1], O_RDONLY);
