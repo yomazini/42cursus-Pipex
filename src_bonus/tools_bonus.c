@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:25 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 20:03:54 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/17 20:48:40 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	handle_hdoc(char *limiter, int *prev_pipe)
 			line = get_next_line(STDIN_FILENO);
 			if (!line)
 				break ;
-			if (strcmp(line, expected) == 0)
+			if (ft_strncmp(line, expected, ft_strlen(line)) == 0)
 			{
 				free(line);
 				exit(0);
