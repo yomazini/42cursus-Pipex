@@ -1,5 +1,5 @@
 NAME = pipex
-BONUS_NAME = pipex_bonus
+BONUS_NAME = pipex
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
@@ -10,7 +10,7 @@ SRCS = src/pipex.c src/tools.c src/tools1.c
 OBJS = $(SRCS:.c=.o)
 HEADERS = src/pipex.h 
 
-SRCS_BONUS = src_bonus/pipex_bonus.c src_bonus/tools_bonus.c 
+SRCS_BONUS = src_bonus/pipex_bonus.c src_bonus/tools_bonus.c src/tools.c src/tools1.c 
 OBJS_BONUS = $(SRCS_BONUS:.c=.o)
 HEADERS_BONUS = src_bonus/pipex_bonus.h
 
