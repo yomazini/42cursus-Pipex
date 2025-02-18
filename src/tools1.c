@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 21:06:00 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/18 11:50:06 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/18 11:58:41 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	setup_child_redirection(char *infile, int *pipe_fds)
 	if (fd == -1)
 	{
 		perror("pipex: infile");
-		return ;
+		exit(1);
 	}
 	dup2(fd, 0);
 	dup2(pipe_fds[1], 1);

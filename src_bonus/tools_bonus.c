@@ -43,7 +43,11 @@ void	exec_cmd(char *cmd, char **env)
 
 	args = parse_cmd(cmd);
 	if (!args || !args[0])
-		(ft_putstr_fd("pipex: command not found\n", 2), exit(127));
+	{
+		free_all(args);
+		ft_putstr_fd("pipex: command not found\n", 2);
+		exit(127);
+	}
 	path = find_command_path(args, env);
 	if (!path)
 	{
