@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:34:13 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/18 13:58:49 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/18 15:36:59 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,9 @@
 # include "../lib/libft.h"
 # include <unistd.h>
 # include <stdio.h>
-# include <stdlib.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <fcntl.h>  
-
-// check this
 
 pid_t	handle_multipipe(int ac, char **av, char **env, int hdoc);
 void	handle_hdoc(char *limiter, int *prev_pipe);
