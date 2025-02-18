@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:20 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/18 11:03:58 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/18 11:36:12 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,10 @@ static void	handle_input(char **av, int *in_fd, int hdoc)
 	{
 		*in_fd = open(av[1], O_RDONLY);
 		if (*in_fd < 0)
-			(perror(av[1]), exit(1));
+		{
+			perror(av[1]);
+			exit(1);
+		}
 		(dup2(*in_fd, 0), close(*in_fd));
 	}
 }
@@ -107,7 +110,10 @@ int	main(int ac, char **av, char **env)
 	pid_t	last_pid;
 
 	if (ac < 5 + (ft_strncmp(av[1], "here_doc", 9) == 0))
-		(ft_putstr_fd("Invalid number of arguments\n", 2), exit(1));
+	{
+		ft_putstr_fd("Invalid number of arguments\n", 2);
+		exit(1);
+	}
 	hdoc = (ft_strncmp(av[1], "here_doc", 9) == 0);
 	handle_input(av, &in_fd, hdoc);
 	last_pid = handle_multipipe(ac, av, env, hdoc);
