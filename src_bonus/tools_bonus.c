@@ -6,7 +6,7 @@
 /*   By: ymazini <ymazini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 14:24:25 by ymazini           #+#    #+#             */
-/*   Updated: 2025/02/17 22:50:22 by ymazini          ###   ########.fr       */
+/*   Updated: 2025/02/18 10:45:16 by ymazini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,17 +65,16 @@ void	handle_hdoc(char *limiter, int *prev_pipe)
 
 	expected = ft_strjoin(limiter, "\n");
 	if (!expected)
-		exit(EXIT_FAILURE);
+		exit(1);
 	if (pipe(fd) == -1)
 		(perror("pipex: pipe"), free(expected), exit(1));
 	pid = fork();
 	if (pid == 0)
 	{
 		close(fd[0]);
-		signal(SIGINT, SIG_DFL);
 		while (1)
 		{
-			line = get_next_line(STDIN_FILENO);
+			line = get_next_line(0);
 			if (!line || ft_strncmp(line, expected, ft_strlen(line)) == 0) 
 			{
 				free(line);
@@ -86,7 +85,7 @@ void	handle_hdoc(char *limiter, int *prev_pipe)
 		}
 		close(fd[1]);
 		free(expected);
-		exit(EXIT_SUCCESS);
+		exit(0);
 	}
 	else
 	{
@@ -108,6 +107,6 @@ int	open_outfile(char *path, int hdoc)
 		flags = O_WRONLY | O_CREAT | O_TRUNC;
 	fd = open(path, flags, 0644);
 	if (fd < 0)
-		(perror("pipex: outfile"), exit(EXIT_FAILURE));
+		(perror("pipex: outfile"), exit(1));
 	return (fd);
 }
