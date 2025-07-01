@@ -17,12 +17,29 @@ HEADERS_BONUS = src_bonus/pipex_bonus.h
 LIBFT_DIR = lib
 LIBFT = $(LIBFT_DIR)/libft.a
 
+define PIPEX_BANNER
+	@echo "$(RED)"
+	@echo "██████╗ ██╗██████╗ ███████╗██╗  ██╗"
+	@echo "██╔══██╗██║██╔══██╗██╔════╝╚██╗██╔╝"
+	@echo "██████╔╝██║██████╔╝█████╗   ╚███╔╝ "
+	@echo "██╔═══╝ ██║██╔═══╝ ██╔══╝   ██╔██╗ "
+	@echo "██║     ██║██║     ███████╗██╔╝ ██╗"
+	@echo "╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝"
+	@echo "$(RESET)"
+endef
+
+RED = \033[1;31m
+RESET = \033[0m
+
+
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT)
+	$(PIPEX_BANNER)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LIBFT)
 
 bonus: $(OBJS_BONUS) $(LIBFT)
+	$(PIPEX_BANNER)
 	$(CC) $(CFLAGS) $(OBJS_BONUS) -o $(BONUS_NAME) $(LIBFT)
 
 $(LIBFT):
